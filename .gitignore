@@ -2,6 +2,7 @@
 bin/
 
 *.class
+*.log
 
 # Package Files #
 *.jar
