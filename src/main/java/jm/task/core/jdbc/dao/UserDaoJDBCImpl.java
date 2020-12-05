@@ -18,11 +18,11 @@ public class UserDaoJDBCImpl implements UserDao {
 			"name VARCHAR(30)",
 			"lastName VARCHAR(30)",
 			"age TINYINT(8)");
-		execute(query);
+		update(query).apply(connection);
     }
 
     public void dropUsersTable() {
-		execute("DROP TABLE IF EXISTS users");
+		update("DROP TABLE IF EXISTS users").apply(connection);
     }
    
     public void saveUser(String name, String lastName, byte age) {
@@ -30,17 +30,17 @@ public class UserDaoJDBCImpl implements UserDao {
 						  "'" + name + "'", 
 						  "'" + lastName + "'", 
 						  age);
-		execute(query);
+		update(query).apply(connection);
     }
 
     public void removeUserById(long id) {
-		execute("DELETE FROM users WHERE id = " + id);
+		update("DELETE FROM users WHERE id = " + id).apply(connection);
     }
 
     public List<User> getAllUsers() {
 		var query = "SELECT name, lastName, age FROM users";
-        try(Statement statement = connection.createStatement()) {
-			ResultSet resultSet = statement.executeQuery(query);
+        try {
+			ResultSet resultSet = query(query).apply(connection);
 			List<User> users = new ArrayList<>();
 			while (resultSet.next()) {
 				users.add(new User(resultSet.getString("name"), 
@@ -54,14 +54,6 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void cleanUsersTable() {
-		execute("DELETE FROM users");
+		update("DELETE FROM users").apply(connection);
     }
-	
-	private void execute(String query) {
-		try(Statement statement = connection.createStatement()) {
-			statement.execute(query);
-		} catch(Exception ex) {
-			throw new RuntimeException(ex);
-		}
-	}
 }
