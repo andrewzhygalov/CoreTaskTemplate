@@ -8,6 +8,8 @@ public interface UserService {
     void createUsersTable();
 
     void dropUsersTable();
+	
+	void saveUser(User user);
 
     void saveUser(String name, String lastName, byte age);
 

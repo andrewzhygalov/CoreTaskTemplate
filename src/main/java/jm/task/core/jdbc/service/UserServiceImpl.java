@@ -5,7 +5,7 @@ import jm.task.core.jdbc.dao.*;
 import java.util.List;
 
 public class UserServiceImpl implements UserService {
-	private final UserDao dao = new UserDaoJDBCImpl();
+	private final UserDao dao = new UserDaoHibernateImpl();
     public void createUsersTable() {
 		dao.createUsersTable();
     }
@@ -13,7 +13,10 @@ public class UserServiceImpl implements UserService {
     public void dropUsersTable() {
 		dao.dropUsersTable();
     }
-
+    
+	public void saveUser(User user) {
+		dao.saveUser(user);
+	}
     public void saveUser(String name, String lastName, byte age) {
 		dao.saveUser(name, lastName, age);
     }

@@ -13,24 +13,27 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void createUsersTable() {
-		var query = buildCreateQuery("users", 
-			"id BIGINT(64) PRIMARY KEY AUTO_INCREMENT",
-			"name VARCHAR(30)",
-			"lastName VARCHAR(30)",
-			"age TINYINT(8)");
+		var query = """
+			CREATE TABLE IF NOT EXISTS users (
+			id BIGINT(64) PRIMARY KEY AUTO_INCREMENT,
+			name VARCHAR(30),
+			lastName VARCHAR(30), 
+			age TINYINT(8))
+		""";
 		update(query).apply(connection);
     }
 
     public void dropUsersTable() {
 		update("DROP TABLE IF EXISTS users").apply(connection);
     }
-   
+    
+	public void saveUser(User user) {
+		saveUser(user.getName(), user.getLastName(), user.getAge());
+	}
     public void saveUser(String name, String lastName, byte age) {
-		var query = buildInsertQuery("users(name, lastName, age)", 
-						  "'" + name + "'", 
-						  "'" + lastName + "'", 
-						  age);
-		update(query).apply(connection);
+		var insert = "INSERT INTO users(name, lastName, age) VALUES ";
+		var values = mkString(", ", "(", ")", asVarchar(name), asVarchar(lastName), age);
+		update(insert + values).apply(connection);
     }
 
     public void removeUserById(long id) {
@@ -39,8 +42,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public List<User> getAllUsers() {
 		var query = "SELECT name, lastName, age FROM users";
-        try {
-			ResultSet resultSet = query(query).apply(connection);
+        try(ResultSet resultSet = query(query).apply(connection)){
 			List<User> users = new ArrayList<>();
 			while (resultSet.next()) {
 				users.add(new User(resultSet.getString("name"), 
