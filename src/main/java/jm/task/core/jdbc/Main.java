@@ -9,7 +9,7 @@ public class Main {
 	static UserService service  = new UserServiceImpl();
     public static void main(String[] args) throws Exception {
 		service.createUsersTable();
-		List.of(new User("Ivan", "Ivanov", (byte)25), 
+	List.of(new User("Ivan", "Ivanov", (byte)25), 
 			new User("Lena", "Petrova", (byte) 21), 
 			new User("Petr", "Semenov", (byte)34), 
 			new User("Anna", "Sidorova", (byte)42))

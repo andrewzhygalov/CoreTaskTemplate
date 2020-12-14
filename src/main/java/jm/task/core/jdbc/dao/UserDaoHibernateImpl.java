@@ -5,30 +5,28 @@ import jm.task.core.jdbc.model.User;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.function.Consumer;
-import static jm.task.core.jdbc.util.Util.*;
-import org.hibernate.*;
-import java.sql.Connection;
+import jm.task.core.jdbc.util.Util;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+
 public class UserDaoHibernateImpl implements UserDao {
     private SessionFactory factory;
 	public UserDaoHibernateImpl() {
-		factory = getSessionFactory();
+		factory = Util.getSessionFactory();
     }
 
 
     @Override
     public void createUsersTable() {
-		executeNative("""
-			CREATE TABLE IF NOT EXISTS users (
-			id BIGINT(64) PRIMARY KEY AUTO_INCREMENT,
-			name VARCHAR(255),
-			lastName VARCHAR(255), 
-			age TINYINT(8))
-		""");
+		if(factory == null) {
+			factory = Util.getSessionFactory();
+		}
     }
 
     @Override
     public void dropUsersTable() {
 		executeNative("DROP TABLE IF EXISTS users");
+		factory = null;
     }
 
     @Override
@@ -71,8 +69,8 @@ public class UserDaoHibernateImpl implements UserDao {
 	}
 	
 	private void executeNative(String query) {
-		Connection connection = getConnection();
-		update(query).apply(connection);
+		Util.update(query).apply(Util.getConnection());
 	}
+	
 	
 }
