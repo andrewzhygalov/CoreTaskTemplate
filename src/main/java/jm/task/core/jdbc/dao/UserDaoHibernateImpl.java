@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 import jm.task.core.jdbc.util.Util;
+import jm.task.core.jdbc.util.Operations;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -25,7 +26,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void dropUsersTable() {
-		executeNative("DROP TABLE IF EXISTS users");
+		Operations.executeUpdate("DROP TABLE IF EXISTS users");
 		factory = null;
     }
 
@@ -66,11 +67,5 @@ public class UserDaoHibernateImpl implements UserDao {
 			update.accept(session);
 			session.getTransaction().commit();
 		}
-	}
-	
-	private void executeNative(String query) {
-		Util.update(query).apply(Util.getConnection());
-	}
-	
-	
+	}	
 }

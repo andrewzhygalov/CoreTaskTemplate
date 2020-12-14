@@ -47,23 +47,5 @@ public class Util {
 	public static String asVarchar(String field) {
 		return "'" + field + "'";
 	}
-	public static Function<Connection, Boolean> update(String query) {
-		return connection -> {
-			try(Statement statement = connection.createStatement()) {
-				return statement.execute(query);
-			} catch(Exception ex) {
-				throw new RuntimeException(ex);
-			}
-		};
-	}
-	public static Function<Connection, ResultSet> query(String query) {
-		return connection -> {
-			try {
-				Statement statement = connection.createStatement();
-				return statement.executeQuery(query);
-			} catch(Exception ex) {
-				throw new RuntimeException(ex);
-			}
-		};
-	}
+	
 }

@@ -4,12 +4,20 @@ import java.sql.Connection;
 import java.sql.Statement;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.function.Function;
 import jm.task.core.jdbc.model.User;
 import static jm.task.core.jdbc.util.Util.*;
+import jm.task.core.jdbc.util.Operations;
 public class UserDaoJDBCImpl implements UserDao {
-    private final Connection connection;
+	private static User resultSetToUserMapping(ResultSet resultSet) {
+		try {
+			return new User(resultSet.getString("name"), resultSet.getString("lastName"),
+								   resultSet.getByte("age"));
+		} catch(Exception ex) { throw new RuntimeException(ex); }
+	}
+	
 	public UserDaoJDBCImpl() {
-		connection = getConnection();
+
     }
 
     public void createUsersTable() {
@@ -20,11 +28,11 @@ public class UserDaoJDBCImpl implements UserDao {
 			lastName VARCHAR(30), 
 			age TINYINT(8))
 		""";
-		update(query).apply(connection);
+		Operations.executeUpdate(query);
     }
 
     public void dropUsersTable() {
-		update("DROP TABLE IF EXISTS users").apply(connection);
+		Operations.executeUpdate("DROP TABLE IF EXISTS users");
     }
     
 	public void saveUser(User user) {
@@ -33,29 +41,19 @@ public class UserDaoJDBCImpl implements UserDao {
     public void saveUser(String name, String lastName, byte age) {
 		var insert = "INSERT INTO users(name, lastName, age) VALUES ";
 		var values = mkString(", ", "(", ")", asVarchar(name), asVarchar(lastName), age);
-		update(insert + values).apply(connection);
+		Operations.executeUpdate(insert + values);
     }
 
     public void removeUserById(long id) {
-		update("DELETE FROM users WHERE id = " + id).apply(connection);
+		Operations.executeUpdate("DELETE FROM users WHERE id = " + id);
     }
 
     public List<User> getAllUsers() {
 		var query = "SELECT name, lastName, age FROM users";
-        try(ResultSet resultSet = query(query).apply(connection)){
-			List<User> users = new ArrayList<>();
-			while (resultSet.next()) {
-				users.add(new User(resultSet.getString("name"), 
-								   resultSet.getString("lastName"),
-								   resultSet.getByte("age")));
-			}
-			return users;
-		} catch(Exception ex) {
-			throw new RuntimeException(ex);
-		}
+        return Operations.collect(query, UserDaoJDBCImpl::resultSetToUserMapping);
     }
 
     public void cleanUsersTable() {
-		update("DELETE FROM users").apply(connection);
+		Operations.executeUpdate("DELETE FROM users");
     }
 }
