@@ -25,7 +25,11 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void dropUsersTable() {
-		executeNative("DROP TABLE IF EXISTS users");
+		if(factory != null) {
+			loanSession( session -> 
+				session.createSQLQuery("DROP TABLE IF EXISTS users")
+						.executeUpdate());
+		}
 		factory = null;
     }
 
@@ -67,10 +71,4 @@ public class UserDaoHibernateImpl implements UserDao {
 			session.getTransaction().commit();
 		}
 	}
-	
-	private void executeNative(String query) {
-		Util.update(query).apply(Util.getConnection());
-	}
-	
-	
 }
